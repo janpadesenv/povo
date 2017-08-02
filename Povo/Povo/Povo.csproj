@@ -39,6 +39,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Class1.cs" />
+    <Compile Include="Models\Class2.cs" />
     <Compile Include="Models\Pessoa.cs" />
     <Compile Include="Models\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
