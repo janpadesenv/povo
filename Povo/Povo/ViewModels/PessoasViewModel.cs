@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using Povo.Models;
+using Povo.Services;
 using Xamarin.Forms;
 
 namespace Povo.ViewModels {
@@ -20,40 +21,29 @@ namespace Povo.ViewModels {
 
         }
 
-        private string teste;
-        public string Teste {
-            get { return teste; }
-            set { teste = value; }
-        }
-
-        public List<Pessoa> ListaDePessoas { get; set; }
+        public Command GetPessoasComando { get; set; }
+        public Command PushPessoaComando { get; set; }
+        public ObservableCollection<Pessoa> ListaDePessoas { get; set; }
 
         public PessoasViewModel() {
-            teste = "teste";
-            ListaDePessoas = new List<Pessoa>();
+            ListaDePessoas = new ObservableCollection<Pessoa>();
             GetPessoasComando = new Command(async () => await GetPessoas(), () => !IsBusy);
+            PushPessoaComando = new Command(async () => await PushPessoa(), () => !IsBusy);
         }
 
-        async Task GetPessoas() {
-            //detectar se atualmente o ViewModel se encontra ocupado obtendo os dados
+        async Task PushPessoa() {
+            Pessoa p = new Pessoa();
+            p.Nome = "pierre3";
+            p.Id = "300";
+
             if (!IsBusy) {
                 Exception Error = null;
-                //estabelecendo IsBusy a true e posteriormente a false quando iniciamos a recuperação da informação
-                //a partir do repositório e quando terminamos de obter os dados.
                 try {
-                    //Obtendo os dados do repositório
                     IsBusy = true;
-                    var Repository = new Repository();
-                    var Items = await Repository.GetPessoasDoRepositorio();
-
-                    //limpar a lista atual de objetos "Cat" e carregá-los a partir da coleção Items
-                    ListaDePessoas.Clear();
-                    foreach (var pessoa in Items) {
-                        ListaDePessoas.Add(pessoa);
-                    }
+                    var repositorio = new AzureService();
+                    await repositorio.InsereNaTabela(p);
                 }
 
-                //Se algo der errado, o bloco catch guardará a exceção e depois do bloco finally poderemos mostrar uma mensagem emergente.
                 catch (Exception ex) {
                     Error = ex;
                 }
@@ -61,9 +51,39 @@ namespace Povo.ViewModels {
                     IsBusy = false;
                 }
 
-                //mostrar uma mensagem em caso de que se tenha gerado uma exceção
                 if (Error != null) {
-                    await Xamarin.Forms.Application.Current.MainPage.DisplayAlert("Error!", Error.Message, "OK");
+                    await Xamarin.Forms.Application.Current.MainPage.DisplayAlert("Error de Post", Error.Message, "OK");
+                }
+            }
+            await this.GetPessoas();
+            return;
+        }
+
+
+        async Task GetPessoas() {
+
+            if (!IsBusy) {
+                Exception Error = null;
+                try {
+                    IsBusy = true;
+                    var repositorio = new AzureService();
+                    var tabelaInteira = await repositorio.GetTabelaInteira();
+
+                    ListaDePessoas.Clear();
+                    foreach (var pessoa in tabelaInteira) {
+                        ListaDePessoas.Add(pessoa);
+                    }
+                }
+
+                catch (Exception ex) {
+                    Error = ex;
+                }
+                finally {
+                    IsBusy = false;
+                }
+
+                if (Error != null) {
+                    await Xamarin.Forms.Application.Current.MainPage.DisplayAlert("Error de Get", Error.Message, "OK");
                 }
             }
             return;
@@ -71,10 +91,5 @@ namespace Povo.ViewModels {
 
         //criar um novo comando chamado "GetCatsCommand". Ele é inicializado no construtor
         //Um objeto Command tem uma interface que sabe qual método invocar e tem uma forma opcional de descrever se o Command está habilitado.
-        public Command GetPessoasComando { get; set; }
-
-
-
-
     }
 }

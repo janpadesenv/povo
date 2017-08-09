@@ -17,21 +17,7 @@ namespace Povo.Views {
             InitializeComponent();
             BindingContext = new Povo.ViewModels.PessoasViewModel();
 
-            BtnSincronizar.Clicked += BtnSincronizar_Clicked;
-
-
-
-
         }
 
-        public void BtnSincronizar_Clicked(object sender, EventArgs e) {
-            //////var lista = new ObservableCollection<Pessoa>();
-            ////List<Pessoa> lista = new List<Pessoa>();
-            //ObservableCollection<Pessoa> lista = ListViewPessoas;
-            //var lista = sender;
-            var l = new Povo.ViewModels.PessoasViewModel();
-            var lista = l.ListaDePessoas;
-             Navigation.PushAsync(new PessoaView(lista));
-        }
     }
 }

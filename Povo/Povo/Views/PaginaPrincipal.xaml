@@ -6,6 +6,7 @@
     
     <StackLayout>
         <Button x:Name="BtnSincronizar" Text="SINCRONIZAR" Command="{Binding GetPessoasComando}"/>
+        <Button x:Name="BtnAddPessoa" Text="ADD PESSOA" Command="{Binding PushPessoaComando}"/>
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"/>
 
         <ListView x:Name="ListViewPessoas"   ItemsSource="{Binding ListaDePessoas}" >
